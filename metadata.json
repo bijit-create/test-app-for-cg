@@ -1,0 +1,6 @@
+{
+  "name": "Indian Voice HTML Enhancer",
+  "description": "Upload HTML files with TTS narration scripts and automatically enhance them with high-quality Indian English AI voices using Gemini 2.5 Flash TTS.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
