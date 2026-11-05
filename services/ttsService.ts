@@ -1,4 +1,7 @@
-import { GoogleGenAI, Modality } from "@google/genai";
+import { ai } from "./geminiClient";
+
+// Mirrors Modality.AUDIO from @google/genai without bundling the SDK.
+const MODALITY_AUDIO = "AUDIO";
 
 /**
  * Decodes base64 string to Uint8Array
@@ -98,7 +101,6 @@ async function generateOpenAIAudio(text: string, apiKey: string): Promise<string
  */
 export const generateIndianAudio = async (text: string, openAIKey?: string): Promise<string | null> => {
   if (!text || !text.trim()) return null;
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   const maxRetries = 3;
   let attempt = 0;
@@ -109,7 +111,7 @@ export const generateIndianAudio = async (text: string, openAIKey?: string): Pro
         model: "gemini-2.5-flash-preview-tts",
         contents: [{ parts: [{ text: `Speak with a professional Indian English accent: ${text}` }] }],
         config: {
-          responseModalities: [Modality.AUDIO],
+          responseModalities: [MODALITY_AUDIO],
           speechConfig: {
             voiceConfig: {
               prebuiltVoiceConfig: { voiceName: 'Kore' },
