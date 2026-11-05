@@ -1,10 +1,6 @@
-
-import { GoogleGenAI } from "@google/genai";
-
-const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY! });
+import { ai } from "./geminiClient";
 
 export const analyzeDocument = async (htmlContent: string) => {
-  const ai = getAI();
   const response = await ai.models.generateContent({
     model: "gemini-3-pro-preview",
     contents: [{
@@ -24,19 +20,23 @@ export const analyzeDocument = async (htmlContent: string) => {
     }
   });
 
-  return response.text;
+  return response.text ?? "";
 };
 
 export const chatWithDocument = async (query: string, context: string, history: {role: string, parts: string}[]) => {
-  const ai = getAI();
-  const chat = ai.chats.create({
+  // Stateless equivalent of ai.chats.create(...).sendMessage(...): prior turns
+  // are sent as contents so the proxy only needs to expose generateContent.
+  const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
+    contents: [
+      ...history.map(h => ({ role: h.role, parts: [{ text: h.parts }] })),
+      { role: "user", parts: [{ text: query }] },
+    ],
     config: {
       systemInstruction: `You are a helpful assistant talking about a specific document. Use the following context to answer questions accurately.
       Context: ${context.substring(0, 10000)}`,
     }
   });
 
-  const response = await chat.sendMessage({ message: query });
-  return response.text;
+  return response.text ?? "";
 };
